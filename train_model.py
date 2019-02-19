@@ -116,9 +116,15 @@ elif args.model=="Dense":
 if nn_model.regression:
     loss = nn_model.model.evaluate(test_X, test_y, verbose=0)
     print("Generalization loss: ", loss)
+    #FOR TCN show how accuracy gets better when more timesteps are presented
+    #if args.model=="TCN":
+     #   nn_model.show_loss_over_time(test_X, test_y)
 else:
     loss, accuracy = nn_model.model.evaluate(test_X, test_y, verbose=0)
     print("Generalization accuracy: ", accuracy, " - loss: ", loss)
     print("    (for TCN this includes data with zero padding at beginning)")
-dataset_loader.evaluate_last_predictions(nn_model.get_prediction_without_padding(test_X), 
-    nn_model.get_targets_without_padding(test_y))
+    #FOR TCN show how accuracy gets better when more timesteps are presented
+    #nn_model.show_accuracy_over_time(test_X, test_y)
+dataset_loader.evaluate_predictions(nn_model.model.predict(test_X), test_y )
+#dataset_loader.evaluate_last_predictions(nn_model.get_prediction_without_padding(test_X), 
+ #   nn_model.get_targets_without_padding(test_y))

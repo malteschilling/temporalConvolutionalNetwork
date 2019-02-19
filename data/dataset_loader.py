@@ -78,16 +78,39 @@ class ElectricFishDataSet:
         #plt.savefig("Results/Fig_Hidden_ActivationHiddenLayer_3D.pdf")
         #plt.show()
     
-    def evaluate_last_predictions(self, test_pred, test_y):
-        diff_train = np.abs(test_pred - test_y)
-        print("SHAPES: ", test_pred.shape, test_y.shape)
-        print("Mean position difference [1..81]: ", np.mean( self.norm_factors[0,0:2]*diff_train[:,0:2], axis=0 ) )
-        print("Std dev position difference: ", np.std( self.norm_factors[0,0:2]*diff_train[:,0:2], axis=0 ) )
-        diff_cos = np.sum(test_y[:,2:4] * test_pred[:,2:4],axis=1)
-        diff_cos = diff_cos / np.linalg.norm(test_pred[:,2:4], axis=1)
+    def evaluate_predictions(self, test_pred, test_y):
+        if (len(test_pred.shape) > 2):
+            last_pred = test_pred[:,-1,:]
+            last_y = test_y[:,-1,:]
+            #targets_y_ext = np.tile(targets_y, (set_X.shape[1],1))
+            # Plot a graph that shows how the mean abs error develops over time.
+            # Initially, a net will mostly get zero padding and will perform 
+            # therefore worse. For a fair comparison we therefore look at the last 
+            # prediction as well as the mean absolute error over time (plus the minimal error
+            # as the last time step is quite bad for the sinus curve data set)
+            diff_over_time = np.abs(test_pred - test_y)
+            abs_error_over_time = np.mean(self.norm_factors[0,0:2]*diff_over_time[:,:,0:2], axis=(0,2))
+            print("Minimal abs error over time [1..81]: ", np.min(abs_error_over_time), 
+                " - at time: ", np.argmin(abs_error_over_time))             
+            ax_error = plt.subplot(111) 
+            ax_error.plot(abs_error_over_time)
+            plt.xlabel('Time steps of presented time window')
+            plt.ylabel('Abs error')
+            plt.title('Mean abs error over time window')
+            plt.grid(True) 
+            plt.show()
+        else:
+            last_pred = test_pred
+            last_y = test_y
+        diff_train = np.abs(last_pred - last_y)
+        print("SHAPES: ", last_pred.shape, last_y.shape)
+        print("Mean (absolute) position difference for last timestep [1..81]: ", np.mean( self.norm_factors[0,0:2]*diff_train[:,0:2], axis=0 ) )
+        print("Std dev position difference for last timestep: ", np.std( self.norm_factors[0,0:2]*diff_train[:,0:2], axis=0 ) )
+        diff_cos = np.sum(last_y[:,2:4] * last_pred[:,2:4],axis=1)
+        diff_cos = diff_cos / np.linalg.norm(last_pred[:,2:4], axis=1)
         np.clip(diff_cos, -1., 1., out=diff_cos)
         diff_angle =np.arccos(diff_cos)
-        print("Orientation (degrees) mean/std: ", np.mean(diff_angle)*180/np.pi, np.std(diff_angle)*180/np.pi)
+        print("Orientation (degrees) mean/std for last timestep: ", np.mean(diff_angle)*180/np.pi, np.std(diff_angle)*180/np.pi)
 
 class SmartPhoneDataSet(ElectricFishDataSet):
     # Data in the dataset is organised in single files:
@@ -134,8 +157,30 @@ class SmartPhoneDataSet(ElectricFishDataSet):
         regression = False
         return train_X, train_y, test_X, test_y, regression
         
-    def evaluate_last_predictions(self, test_pred, test_y):
+    def evaluate_predictions(self, test_pred, test_y):
+        if (len(test_pred.shape) > 2):
+            last_pred = test_pred[:,-1,:]
+            last_y = test_y[:,-1,:]
+            #targets_y_ext = np.tile(targets_y, (set_X.shape[1],1))
+            # Plot a graph that shows how the accuracy develops over time.
+            # Initially, a net will mostly get zero padding and will perform 
+            # therefore worse. For a fair comparison we therefore look at the last 
+            # prediction as well as the accuracy/loss over time.
+            miss_classification_over_time = 1.* np.sum( 
+                np.argmax(test_pred, axis=2) <> np.argmax(test_y,axis=2) , axis=0)
+            accuracy_over_time = 1. - miss_classification_over_time/test_y.shape[0]
+            #self.fig = plt.figure(figsize=(8, 6))    
+            ax_accuracy = plt.subplot(111) 
+            ax_accuracy.plot(accuracy_over_time)
+            plt.xlabel('Time steps of presented time window')
+            plt.ylabel('Accuracy')
+            plt.title('Accuracy over time window')
+            plt.grid(True) 
+            plt.show()
+        else:
+            last_pred = test_pred
+            last_y = test_y
         print("Number of miss classifications when excluding any padding: ", \
-            np.sum( np.argmax(test_pred, axis=1) <> np.argmax(test_y,axis=1) ), \
-            ", size test set: ", test_y.shape[0], " test accuracy: ",  
-            1. - 1.*np.sum( np.argmax(test_pred, axis=1) <> np.argmax(test_y,axis=1) )/test_y.shape[0])
+            np.sum( np.argmax(last_pred, axis=1) <> np.argmax(last_y,axis=1) ), \
+            ", size test set: ", last_y.shape[0], " test accuracy: ",  
+            1. - 1.*np.sum( np.argmax(last_pred, axis=1) <> np.argmax(last_y,axis=1) )/last_y.shape[0])

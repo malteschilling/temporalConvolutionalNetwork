@@ -101,11 +101,16 @@ Different configurations were tested:
 
 * TCN original architecture (as described in original paper, with Blocks of 1, 2, 4, 8 dilation size; kernel\_size=5, filter\_number=28; Total params: 28,984);
 Receptive field size = 121;
-	* Mean position difference [1..81]: [12.91877596, 13.16841932]
-	* Std dev position difference: [10.51503209, 11.13334491]
-	* Orientation (degrees) mean/std: 26.777139922117282, 31.44396516740243
+	* Mean (absolute) position difference for last timestep [1..81]: [14.66728339, 15.01606241]
+	* Std dev position difference for last timestep: [10.95818841, 11.51426357]
+	* Orientation (degrees) mean/std for last timestep: 30.990351403099513, 38.488101430834526
+	* Minimal abs error over time [1..81]: 13.070564812215247 - at time step: 52
+
+![Electric fish data, error over time](Data/loss_over_time.pdf)
+When looking at the electric fish data, one can see that the error is initially very high. The reason is that there is zero padding and the prediction is only based on very little real data. It rises also at the end. This is most probably due to the sinusoidal data.
 
 * TCN architecture (with Blocks of 1, 2, 4, 2, 1 dilation size; kernel\_size=7, filter\_number=21; Total params: 29,278); Receptive field = 121; 
 	* Mean position difference [1..81]: [16.87574486, 18.66155783]
+	* Minimal abs error over time [1..81]: 14.285876066196264, - at time step 43
 	* Std dev position difference: [11.09996728, 11.38420293]
 	* Orientation (degrees) mean/std: 26.959646456508253, 37.42577067844571 

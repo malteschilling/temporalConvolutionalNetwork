@@ -64,9 +64,9 @@ class TemporalConvolutionalNetwork:
         tcnOutput = TemporalConvolutionalBlock( tcnOutput, filter_number=filter_number, kernel_size=kernel_size,
                 padding=padding, dilation_rate=4 )
         tcnOutput = TemporalConvolutionalBlock( tcnOutput, filter_number=filter_number, kernel_size=kernel_size,
-                padding=padding, dilation_rate=2 )
-        tcnOutput = TemporalConvolutionalBlock( tcnOutput, filter_number=filter_number, kernel_size=kernel_size,
-                padding=padding, dilation_rate=1 )
+                padding=padding, dilation_rate=8 )
+#        tcnOutput = TemporalConvolutionalBlock( tcnOutput, filter_number=filter_number, kernel_size=kernel_size,
+ #               padding=padding, dilation_rate=1 )
         
         self.regression = regression
         if self.regression:
@@ -114,9 +114,34 @@ class TemporalConvolutionalNetwork:
         #print(self.model.predict(val_X[200:210]))
         #print(val_y[200:210])
         
-    def get_prediction_without_padding(self, set_X):
-        complete_time_series = self.model.predict(set_X)
-        return complete_time_series[:,-1,:]
+#     def show_accuracy_over_time(self, set_X, targets_y):
+#         import numpy as np
+#         set_y = self.model.predict(set_X)
+#         #targets_y_ext = np.tile(targets_y, (set_X.shape[1],1))
+#         miss_classification_over_time = 1.* np.sum( 
+#             np.argmax(set_y, axis=2) <> np.argmax(targets_y,axis=2) , axis=0)
+#         accuracy_over_time = 1. - miss_classification_over_time/set_X.shape[0]
+#         import matplotlib.pyplot as plt
+#         self.fig = plt.figure(figsize=(8, 6))    
+#         ax_accuracy = plt.subplot(111) 
+#         ax_accuracy.plot(accuracy_over_time)
+#         plt.show()
+#         
+#     def show_loss_over_time(self, set_X, targets_y):
+#         import numpy as np
+#         set_y = self.model.predict(set_X)
+#         loss_over_time = np.mean(np.square(set_y - targets_y), axis=(0,2))
+#         print("Minimal loss over time: ", np.min(loss_over_time), 
+#             " - at time: ", np.argmin(loss_over_time))
+#         import matplotlib.pyplot as plt
+#         self.fig = plt.figure(figsize=(8, 6))    
+#         ax_loss = plt.subplot(111) 
+#         ax_loss.plot(loss_over_time)
+#         plt.show()
         
-    def get_targets_without_padding(self, set_y):
-        return set_y[:,-1,:]
+#    def get_prediction_without_padding(self, set_X):
+ #       complete_time_series = self.model.predict(set_X)
+  #      return complete_time_series[:,-1,:]
+        
+#    def get_targets_without_padding(self, set_y):
+ #       return set_y[:,-1,:]
