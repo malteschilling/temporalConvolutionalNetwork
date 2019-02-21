@@ -4,7 +4,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--num_epochs', type=int, default=10, help='Number of training epochs')
 parser.add_argument('--dataset', type=str, default="electric_fish", help='Dataset you are using: electric_fish or smartphone')
-parser.add_argument('--model', type=str, default="TCN", help='The model you are using: TCN, Conv1D, Dense ')
+parser.add_argument('--model', type=str, default="TCN", help='The model you are using: TCN, Conv1D, Dense, LSTM ')
 args = parser.parse_args()
 
 #######################################
@@ -55,6 +55,13 @@ print("** Training data (", args.dataset, "): ", train_X.shape, train_y.shape, t
     Main goal is to test Temporal Convolutional Networks - this is presented first.
 """
 print("** Train on model type: ", args.model)
+if args.model=="LSTM":
+    from model.LSTMModel import LSTMModel
+    nn_model = LSTMModel(input_shape=(train_X.shape[1],train_X.shape[2]), 
+        output_number=train_y.shape[1],
+        regression=regression)
+    nn_model.train_model(train_X, train_y, test_X, test_y, epochs=args.num_epochs)
+        
 if args.model=="TCN":
     #######################################
     # 2-A Temporal Convolutional Network

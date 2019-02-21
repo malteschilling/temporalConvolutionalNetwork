@@ -1,0 +1,5 @@
+data/UCI_HAR_Dataset/
+data/HARDataset/
+logdir/
+LOCAL/
+*.pyc
